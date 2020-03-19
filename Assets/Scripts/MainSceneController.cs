@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 #pragma warning disable 0649
 
@@ -6,29 +7,30 @@ public class MainSceneController : MonoBehaviour
 {
     #region Variables
     [SerializeField]
-    private MeshMorfing morfer;    
+    private MeshMorfing morfer;
+
+    private DoUndoStack commands = new DoUndoStack();
     #endregion
 
     #region Unity methods
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Z))
-            OnChangeTriangles(1);
+            ExecuteCommands(commands.GetDoDeltas());
         else if (Input.GetKeyDown(KeyCode.X))
-            OnChangeTriangles(-1);
+            commands.GetUndoDeltas(1);
+        else if (Input.GetKeyDown(KeyCode.C))
+            commands.AddCommand(1);
+        else if (Input.GetKeyDown(KeyCode.V))
+            commands.AddCommand(-1);
     }
     #endregion
 
-    #region Public methods
-    #endregion
-
     #region Private methods
-    private void OnChangeTriangles(int _delta)
+    private void ExecuteCommands(List<int> _commands)
     {
-        CustomEventHelper.OnChangeTriangles?.Invoke(_delta);
-    }    
-    #endregion
-
-    #region Coroutines
+        foreach (var command in _commands)
+            morfer.OnChangeTriangles(command);
+    }
     #endregion
 }

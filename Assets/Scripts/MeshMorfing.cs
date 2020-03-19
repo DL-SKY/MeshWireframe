@@ -20,28 +20,34 @@ public class MeshMorfing : MonoBehaviour
 
         UpdateMesh();
     }
-
-    private void OnEnable()
-    {
-        CustomEventHelper.OnChangeTriangles += OnChangeTrianglesHandler;
-    }
-
-    private void OnDisable()
-    {
-        CustomEventHelper.OnChangeTriangles -= OnChangeTrianglesHandler;
-    }
     #endregion
 
     #region Public methods
+    public int GetMaxTriangles()
+    {
+        return originTriangles?.Length / 3 ?? 0;
+    }
+
+    public int GetCurrentTriangles()
+    {
+        return triangles;
+    }
+
+    public void OnChangeTriangles(int _delta, bool _updateMesh = true)
+    {
+        triangles = Mathf.Clamp(triangles + _delta, 1, originTriangles.Length / 3);
+
+        if (_updateMesh)
+            UpdateMesh();
+    }
+
+    public void OnUpdateMesh()
+    {
+        UpdateMesh();
+    }
     #endregion
 
     #region Private methods
-    private void OnChangeTrianglesHandler(int _delta)
-    {
-        triangles = Mathf.Clamp(triangles + _delta, 1, originTriangles.Length / 3);
-        UpdateMesh();
-    }
-
     private void UpdateMesh()
     {
         try
@@ -59,8 +65,5 @@ public class MeshMorfing : MonoBehaviour
         }
         catch { }
     }
-    #endregion
-
-    #region Coroutines
     #endregion
 }
